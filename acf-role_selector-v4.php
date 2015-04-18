@@ -139,14 +139,64 @@ class acf_field_role_selector extends acf_field {
 			</select>
 		<?php
 		else :
-			echo '<ul class="acf-'.$field['field_type'].'-list '.$field['field_type'].' vertical">';
-			foreach( $wp_roles->roles as $role => $data ) :
-				$checked = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'checked="checked"' : '';
-		?>
-		<li><label><input <?php echo $checked ?> type="<?php echo $field['field_type'] ?>" name="<?php echo $field['name'] ?>[]" value="<?php echo $role ?>"><?php echo $data['name'] ?></label></li>
-		<?php
-			endforeach;
-			echo '</ul>';
+			// value must be array
+			if( !is_array($field['value']) )
+			{
+				// perhaps this is a default value with new lines in it?
+				if( strpos($field['value'], "\n") !== false )
+				{
+					// found multiple lines, explode it
+					$field['value'] = explode("\n", $field['value']);
+				}
+				else
+				{
+					$field['value'] = array( $field['value'] );
+				}
+			}
+		
+			// trim value
+			$field['value'] = array_map('trim', $field['value']);
+
+			// vars
+			$i = 0;
+			$e = '<input type="hidden" name="' .  esc_attr($field['name']) . '" value="" />';
+			$e .= '<ul class="acf-'.$field['field_type'].'-list ' . esc_attr($field['class']) . ' vertical">';
+			
+			
+			// checkbox saves an array
+			$field['name'] .= '[]';
+
+			// foreach roles
+			foreach( $wp_roles->roles as $role => $data )
+			{
+				// vars
+				$i++;
+				$atts = '';
+				
+				
+				if( !empty( $field['value'] ) AND in_array($role, $field['value']) )
+				{
+					$atts = 'checked="yes"';
+				}
+				
+				
+				// each checkbox ID is generated with the $key, however, the first checkbox must not use $key so that it matches the field's label for attribute
+				$id = $field['id'];
+				
+				if( $i > 1 )
+				{
+					$id .= '-' . $role;
+				}
+				
+				$e .= '<li><label><input id="' . esc_attr($id) . '" type="'.$field['field_type'].'" class="' . esc_attr($field['class']) . '" name="' . esc_attr($field['name']) . '" value="' . esc_attr($role) . '" ' . $atts . ' />' . $data['name'] . '</label></li>';
+			}
+			
+			$e .= '</ul>';
+			
+			
+			// return
+			echo $e;
+
 		endif;
 	}
 
