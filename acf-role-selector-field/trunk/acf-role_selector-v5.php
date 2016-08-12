@@ -209,7 +209,7 @@ class acf_field_role_selector extends acf_field {
 	 */
 	function load_value($value, $post_id, $field) {
 
-		if( $field['return_value'] == 'object' )
+		if( $field['return_value'] == 'object' && is_array( $value ) )
 		{
 			foreach( $value as $key => $name ) {
 				$value[$key] = get_role( $name );
