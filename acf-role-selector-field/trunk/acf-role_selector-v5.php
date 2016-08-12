@@ -146,7 +146,11 @@ class acf_field_role_selector extends acf_field {
 			<select name='<?php echo $field['name'] ?>[]' <?php echo $multiple ?>>
 				<?php
 					foreach( $roles as $role => $data ) :
-					$selected = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'selected="selected"' : '';
+					if ( 'object' === $field['return_value'] ) {
+						$selected = ( !empty( $field['value'] ) && in_array( $role, wp_list_pluck( $field['value'], 'name' ) ) ) ? 'selected="selected"' : '';
+					} else {
+						$selected = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'selected="selected"' : '';
+					}
 				?>
 					<option <?php echo $selected ?> value='<?php echo $role ?>'><?php echo $data['name'] ?></option>
 				<?php endforeach; ?>
