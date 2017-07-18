@@ -146,7 +146,11 @@ class acf_field_role_selector extends acf_field {
 			<select name='<?php echo $field['name'] ?>[]' <?php echo $multiple ?>>
 				<?php
 					foreach( $roles as $role => $data ) :
-					$selected = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'selected="selected"' : '';
+					if ( 'object' === $field['return_value'] ) {
+						$selected = ( !empty( $field['value'] ) && in_array( $role, wp_list_pluck( $field['value'], 'name' ) ) ) ? 'selected="selected"' : '';
+					} else {
+						$selected = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'selected="selected"' : '';
+					}
 				?>
 					<option <?php echo $selected ?> value='<?php echo $role ?>'><?php echo $data['name'] ?></option>
 				<?php endforeach; ?>
@@ -156,7 +160,11 @@ class acf_field_role_selector extends acf_field {
 		else :
 			echo '<ul class="acf-'.$field['field_type'].'-list '.$field['field_type'].' vertical">';
 			foreach( $roles as $role => $data ) :
-				$checked = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'checked="checked"' : '';
+				if ( 'object' === $field['return_value'] ) {
+					$checked = ( !empty( $field['value'] ) && in_array( $role, wp_list_pluck( $field['value'], 'name' ) ) ) ? 'checked="checked"' : '';
+				} else {
+					$checked = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'checked="checked"' : '';
+				}
 		?>
 		<li><label><input <?php echo $checked ?> type="<?php echo $field['field_type'] ?>" name="<?php echo $field['name'] ?>[]" value="<?php echo $role ?>"><?php echo $data['name'] ?></label></li>
 		<?php
@@ -209,7 +217,7 @@ class acf_field_role_selector extends acf_field {
 	 */
 	function load_value($value, $post_id, $field) {
 
-		if( $field['return_value'] == 'object' )
+		if( $field['return_value'] == 'object' && is_array( $value ) )
 		{
 			foreach( $value as $key => $name ) {
 				$value[$key] = get_role( $name );
