@@ -160,7 +160,11 @@ class acf_field_role_selector extends acf_field {
 		else :
 			echo '<ul class="acf-'.$field['field_type'].'-list '.$field['field_type'].' vertical">';
 			foreach( $roles as $role => $data ) :
-				$checked = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'checked="checked"' : '';
+				if ( 'object' === $field['return_value'] ) {
+					$checked = ( !empty( $field['value'] ) && in_array( $role, wp_list_pluck( $field['value'], 'name' ) ) ) ? 'checked="checked"' : '';
+				} else {
+					$checked = ( !empty( $field['value'] ) && in_array( $role, $field['value'] ) ) ? 'checked="checked"' : '';
+				}
 		?>
 		<li><label><input <?php echo $checked ?> type="<?php echo $field['field_type'] ?>" name="<?php echo $field['name'] ?>[]" value="<?php echo $role ?>"><?php echo $data['name'] ?></label></li>
 		<?php
